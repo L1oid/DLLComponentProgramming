@@ -19,7 +19,7 @@ public:
 };
 #endif
 
-class ServerFactory : public IClassFactory2
+class ServerFactory : public IClassFactory2_
 {
 private:
     long m_cRef;

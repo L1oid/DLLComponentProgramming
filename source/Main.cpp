@@ -11,7 +11,7 @@ int main()
     FunctionType GetClassObject;
     HINSTANCE h;
 
-    h = LoadLibrary("C:/Users/lloid/Documents/GitHub/ComponentProgramming/build/ServersDLL.dll");
+    h = LoadLibrary("C:/Users/student/Desktop/Kolesnikov/DLLComponentProgramming-main/build/ServersDLL.dll");
 
     if (!h)
     {
@@ -27,7 +27,7 @@ int main()
           return 0;
     } 
 
-    IClassFactory2* pF = NULL;
+    IClassFactory2_* pF = NULL;
     HRESULT_ result = GetClassObject(CLSID_SERVER, IID_ICLASSFACTORY2, (void**)&pF);
 
     if (result == S_OK_)
@@ -43,13 +43,13 @@ int main()
         if (result == S_OK_)
         {
             cout << "NOK: " << pY->Nod() << endl;
-            pY->Release();
+            pY->Release_();
         }
         else cout << "Warning" << endl;
-        pY->Release();
+        pY->Release_();
     }
     else cout << "Warning" << endl;
-    pF->Release();
+    pF->Release_();
     system("pause");
     return 0;
 }

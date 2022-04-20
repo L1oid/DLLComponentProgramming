@@ -9,15 +9,15 @@ using namespace std;
 
 extern "C" HRESULT_ __declspec(dllexport) GetClassObject(CLSID_ CLSID, IID_ IID, void** ppv)
 {
-    IUnknown* pIUnknown = NULL;
+    IUnknown_* pIUnknown = NULL;
     switch (CLSID) 
     {
     case CLSID_SERVER:
-        pIUnknown = (IClassFactory*) new ServerFactory;
+        pIUnknown = (IClassFactory_*) new ServerFactory;
         cout << "GetClassObject: ServerFactory connected." << endl;
         break;
     case CLSID_SERVER2:
-        pIUnknown = (IClassFactory*) new Server2Factory;
+        pIUnknown = (IClassFactory_*) new Server2Factory;
         cout << "GetClassObject: Server2Factory connected." << endl;
         break;
     default:
@@ -30,7 +30,7 @@ extern "C" HRESULT_ __declspec(dllexport) GetClassObject(CLSID_ CLSID, IID_ IID,
 
 HRESULT_ CreateInstance(CLSID_ CLSID, IID_ IID, void** ppv)
 {
-    IUnknown* pIUnknown = NULL;
+    IUnknown_* pIUnknown = NULL;
     switch (CLSID) 
     {
     case CLSID_SERVER:
@@ -88,7 +88,7 @@ HRESULT_ Server::QueryInterface(IID_ IID, void** ppv)
     switch (IID)
     {
     case IID_IUNKNOWN:
-        *ppv = (IUnknown*)(IX*)ppv;
+        *ppv = (IUnknown_*)(IX*)ppv;
         cout << "Server.QueryInterface: IUnknown connected." << endl;
         break;
     case IID_IX:
@@ -104,7 +104,7 @@ HRESULT_ Server::QueryInterface(IID_ IID, void** ppv)
         cout << "Server.QueryInterface: Invalid interface" << endl;
         return S_FAIL;
     }
-    reinterpret_cast<IUnknown*>(*ppv)->AddRef();
+    reinterpret_cast<IUnknown_*>(*ppv)->AddRef();
     return S_OK_;
 }
 
@@ -154,18 +154,18 @@ HRESULT_ ServerFactory::QueryInterface(IID_ IID, void** ppv)
     {
     case IID_ICLASSFACTORY:
         cout << "ServerFactory.QueryInterface: IClassFactory connected." << endl;
-        *ppv = (IClassFactory*)this;
+        *ppv = (IClassFactory_*)this;
         break;
     case IID_ICLASSFACTORY2:
         cout << "ServerFactory.QueryInterface: IClassFactory2 connected." << endl;
-        *ppv = (IClassFactory2*)this;
+        *ppv = (IClassFactory2_*)this;
         break;
     default:
         cout << "ServerFactory.QueryInterface: Invalid interface" << endl;
         *ppv = NULL;
         return S_FAIL;
     }
-    reinterpret_cast<IUnknown*>(*ppv)->AddRef();
+    reinterpret_cast<IUnknown_*>(*ppv)->AddRef();
     return S_OK_;
 };
 
@@ -219,7 +219,7 @@ HRESULT_ Server2::QueryInterface(IID_ IID, void** ppv)
     switch (IID)
     {
     case IID_IUNKNOWN:
-        *ppv = (IUnknown*)(IY*)ppv;
+        *ppv = (IUnknown_*)(IY*)ppv;
         cout << "Server2.QueryInterface: IUnknown connected." << endl;
         break;
     case IID_IY:
@@ -281,11 +281,11 @@ HRESULT_ Server2Factory::QueryInterface(IID_ IID, void** ppv)
     {
     case IID_ICLASSFACTORY:
         cout << "Server2Factory.QueryInterface: IClassFactory connected." << endl;
-        *ppv = (IClassFactory*)this;
+        *ppv = (IClassFactory_*)this;
         break;
     case IID_ICLASSFACTORY2:
         cout << "Server2Factory.QueryInterface: IClassFactory2 connected." << endl;
-        *ppv = (IClassFactory2*)this;
+        *ppv = (IClassFactory2_*)this;
         break;
     default:
         cout << "Server2Factory.QueryInterface: Invalid interface" << endl;
