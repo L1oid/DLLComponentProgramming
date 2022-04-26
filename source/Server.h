@@ -14,8 +14,8 @@ public:
     virtual int Nok();
     virtual int Nod();
     HRESULT_ QueryInterface(IID_, void**);
-    ULONG_ AddRef();
-    ULONG_ Release();
+    ULONG_ AddRef_();
+    ULONG_ Release_();
 };
 #endif
 
@@ -29,6 +29,6 @@ public:
     HRESULT_ CreateInstance(IID_, void**);
     HRESULT_ CreateInstance2(IID_, void**, int, int);
     HRESULT_ QueryInterface(IID_, void**);
-    ULONG_ AddRef();
-    ULONG_ Release();
+    ULONG_ AddRef_();
+    ULONG_ Release_();
 };

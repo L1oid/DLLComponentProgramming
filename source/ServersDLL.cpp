@@ -104,17 +104,17 @@ HRESULT_ Server::QueryInterface(IID_ IID, void** ppv)
         cout << "Server.QueryInterface: Invalid interface" << endl;
         return S_FAIL;
     }
-    reinterpret_cast<IUnknown_*>(*ppv)->AddRef();
+    reinterpret_cast<IUnknown_*>(*ppv)->AddRef_();
     return S_OK_;
 }
 
-ULONG_ Server::AddRef() 
+ULONG_ Server::AddRef_() 
 { 
     cout << "Server.AddRef = " << m_cRef + 1 << endl;
     return ++m_cRef; 
 } 
  
-ULONG_ Server::Release()
+ULONG_ Server::Release_()
 { 
     cout << "Server.Release = " << m_cRef - 1 << endl;
     if(--m_cRef == 0)
@@ -165,17 +165,17 @@ HRESULT_ ServerFactory::QueryInterface(IID_ IID, void** ppv)
         *ppv = NULL;
         return S_FAIL;
     }
-    reinterpret_cast<IUnknown_*>(*ppv)->AddRef();
+    reinterpret_cast<IUnknown_*>(*ppv)->AddRef_();
     return S_OK_;
 };
 
-ULONG_ ServerFactory::AddRef() 
+ULONG_ ServerFactory::AddRef_() 
 { 
     cout << "ServerFactory.AddRef = " << m_cRef + 1 << endl;
     return ++m_cRef; 
 } 
  
-ULONG_ ServerFactory::Release() 
+ULONG_ ServerFactory::Release_() 
 { 
     cout << "ServerFactory.Release = " << m_cRef - 1 << endl;
     if(--m_cRef == 0)
@@ -231,16 +231,17 @@ HRESULT_ Server2::QueryInterface(IID_ IID, void** ppv)
         cout << "Server2.QueryInterface: Invalid interface" << endl;
         return S_FAIL;
     }
+    reinterpret_cast<IUnknown_*>(*ppv)->AddRef_();
     return S_OK_;
 }
 
-ULONG_ Server2::AddRef() 
+ULONG_ Server2::AddRef_() 
 {
     cout << "Server2.AddRef = " << m_cRef + 1 << endl;
     return ++m_cRef; 
 } 
  
-ULONG_ Server2::Release() 
+ULONG_ Server2::Release_() 
 { 
     cout << "Server2.Release = " << m_cRef - 1 << endl;
     if(--m_cRef == 0)
@@ -292,16 +293,17 @@ HRESULT_ Server2Factory::QueryInterface(IID_ IID, void** ppv)
         *ppv = NULL;
         return S_FAIL;
     }
+    reinterpret_cast<IUnknown_*>(*ppv)->AddRef_();
     return S_OK_;
 }
 
-ULONG_ Server2Factory::AddRef() 
+ULONG_ Server2Factory::AddRef_() 
 { 
     cout << "Server2Factory.AddRef = " << m_cRef + 1 << endl;
     return ++m_cRef; 
 } 
  
-ULONG_ Server2Factory::Release() 
+ULONG_ Server2Factory::Release_() 
 { 
     cout << "Server2Factory.Release = " << m_cRef - 1 << endl;
     if(--m_cRef == 0)

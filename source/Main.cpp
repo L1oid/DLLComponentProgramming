@@ -11,7 +11,7 @@ int main()
     FunctionType GetClassObject;
     HINSTANCE h;
 
-    h = LoadLibrary("C:/Users/student/Desktop/Kolesnikov/DLLComponentProgramming-main/build/ServersDLL.dll");
+    h = LoadLibrary("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/ServersDLL.dll");
 
     if (!h)
     {
