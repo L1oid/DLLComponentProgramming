@@ -8,10 +8,10 @@ typedef HRESULT_ (*FunctionType) (CLSID_, IID_, void**);
 
 int main()
 {
-    FunctionType GetClassObject;
+    FunctionType GetClassObject_;
     HINSTANCE h;
 
-    h = LoadLibrary("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/ServersDLL.dll");
+    h = LoadLibrary("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/Manager.dll");
 
     if (!h)
     {
@@ -19,27 +19,26 @@ int main()
            return 0;
     }
 
-    GetClassObject = (FunctionType) GetProcAddress(h,"GetClassObject");
+    GetClassObject_ = (FunctionType) GetProcAddress(h,"GetClassObject_");
 
-    if (!GetClassObject)
+    if (!GetClassObject_)
     {
           cout << "DLL function not found !!" << endl;
           return 0;
-    } 
+    }
 
     IClassFactory2_* pF = NULL;
-    HRESULT_ result = GetClassObject(CLSID_SERVER, IID_ICLASSFACTORY2, (void**)&pF);
-
+    HRESULT_ result = GetClassObject_(CLSID_SERVER, IID_ICLASSFACTORY2, (void**)&pF);
     if (result == S_OK_)
     {
         IY* pY = NULL;
-        result = pF->CreateInstance2(IID_IY, (void**)&pY, 3, 6);
+        result = pF->CreateInstance2_(IID_IY, (void**)&pY, 3, 6);
         if (result == S_OK_)
         {
             cout << "NOD: " << pY->Nod() << endl;
         }
         else cout << "Warning" << endl;
-        result = pY->QueryInterface(IID_IX, (void**)&pY);
+        result = pY->QueryInterface_(IID_IX, (void**)&pY);
         if (result == S_OK_)
         {
             cout << "NOK: " << pY->Nod() << endl;
