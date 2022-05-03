@@ -1,5 +1,6 @@
 #include <iostream>
 #include <windows.h>
+#include <fstream>
 #include "IUnknown.h"
 #include "OBJBASE.h"
 
@@ -7,24 +8,39 @@ using namespace std;
 
 typedef HRESULT_ (*FunctionType) (CLSID_, IID_, void**);
 
-extern "C" HRESULT_ __declspec(dllexport) GetClassObject_(CLSID_ CLSID, IID_ IID, void** ppv)
+extern "C" HRESULT_ __declspec(dllexport) GetClassObject(CLSID_ CLSID, IID_ IID, void** ppv)
 {
-    FunctionType DLLGetClassObject_;
+    FunctionType DLLGetClassObject;
     HINSTANCE h;
-    h = LoadLibrary("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/ServersDLL.dll");
+    string temp;
+    string str_cls_id = to_string(CLSID);
+    char path[MAX_PATH] = {};
+    ifstream f("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/Reg.txt");
+    while(f >> temp)
+    {
+        if (temp == str_cls_id)
+        {
+            f >> path;
+            break;
+        }
+    }
+    f.close();
+    h = LoadLibrary(path);
     if (!h)
     {
            cout << "DLL not found !" << endl;
-           return 0;
+           return S_FALSE_;
     }
-    DLLGetClassObject_ = (FunctionType) GetProcAddress(h,"DLLGetClassObject_");
-    if (!DLLGetClassObject_)
+    DLLGetClassObject = (FunctionType) GetProcAddress(h,"DLLGetClassObject");
+    if (!DLLGetClassObject)
     {
           cout << "DLL function not found !!" << endl;
-          return 0;
+          return S_FALSE_;
     } 
-    return DLLGetClassObject_(CLSID, IID, ppv);
+    return DLLGetClassObject(CLSID, IID, ppv);
 }
 
-
-//FreeUnusedLibrires - проверка использования DLL
+extern "C" HRESULT_ __declspec(dllexport) FreeUnusedLibrires()
+{
+   //FreeUnusedLibrires - проверка использования DLL
+}

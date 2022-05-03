@@ -1,49 +1,64 @@
 #include <iostream>
 #include <windows.h>
+#include <fstream>
 #include "Server.h"
-#include "Server2.h"
 #include "OBJBASE.h"
 
 using namespace std;
 
-string path;
+TCHAR path[MAX_PATH];
+long global_m_cRef;
 
-extern "C" HRESULT_ __declspec(dllexport) DLLGetClassObject_(CLSID_ CLSID, IID_ IID, void** ppv)
+extern "C" HRESULT_ __declspec(dllexport) DLLGetClassObject(CLSID_ CLSID, IID_ IID, void** ppv)
 {
-    cout << path;
     IUnknown_* pIUnknown = NULL;
     switch (CLSID) 
     {
     case CLSID_SERVER:
-        pIUnknown = (IClassFactory2_*) new ServerFactory;
+        pIUnknown = (IClassFactory_*) new ServerFactory;
         cout << "GetClassObject: ServerFactory connected." << endl;
-        break;
-    case CLSID_SERVER2:
-        pIUnknown = (IClassFactory2_*) new Server2Factory;
-        cout << "GetClassObject: Server2Factory connected." << endl;
         break;
     default:
         cout << "GetClassObject: connection error." << endl;
-        return S_FAIL;
+        return S_FALSE_;
         break;
     }
     return pIUnknown->QueryInterface_(IID, ppv);
 }
 
-extern "C"  HRESULT_ __declspec(dllexport) DllRegisterServer()
+extern "C"  HRESULT_ __declspec(dllexport) DllRegisterServer(void)
 {
-    //с помощью потоков, но с начала нужно получить адрес
-
+    string str_cls_id = to_string(CLSID_SERVER);
+    string temp;
+    ifstream f1("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/Reg.txt");
+    while (f1 >> temp)
+    {
+        if (temp == str_cls_id)
+        {
+            f1.close();
+            return S_OK_;
+        }
+    }
+    f1.close();
+    ofstream f2("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/Reg.txt", ios::app);
+    f2 << CLSID_SERVER << " " << path << endl;
+    f2.close();
+    return S_OK_;
+    
 }
 
-extern "C"  HRESULT_ __declspec(dllexport) DllUnRegisterServer()
+extern "C"  void __declspec(dllexport) DllUnregisterServer()
 {
 
 }
 
 extern "C" HRESULT_ __declspec(dllexport) DllCanUnloadNow_()
 {
-
+    if(global_m_cRef == 0)
+    {
+        return S_OK_;
+    }
+    else return S_FALSE_;
 }
  
 Server::Server() 
@@ -100,7 +115,7 @@ HRESULT_ Server::QueryInterface_(IID_ IID, void** ppv)
     default:
         *ppv = NULL;
         cout << "Server.QueryInterface: Invalid interface" << endl;
-        return S_FAIL;
+        return S_FALSE_;
     }
     reinterpret_cast<IUnknown_*>(*ppv)->AddRef_();
     return S_OK_;
@@ -109,12 +124,19 @@ HRESULT_ Server::QueryInterface_(IID_ IID, void** ppv)
 ULONG_ Server::AddRef_() 
 { 
     cout << "Server.AddRef = " << m_cRef_ + 1 << endl;
+    cout << "Server.GlobalAddRef = " << global_m_cRef + 1 << endl;
+    ++global_m_cRef;
     return ++m_cRef_; 
 } 
  
 ULONG_ Server::Release_()
 { 
     cout << "Server.Release = " << m_cRef_ - 1 << endl;
+    if(global_m_cRef != 0)
+    {
+        cout << "Server.GloblaRelease = " << global_m_cRef - 1 << endl;
+        --global_m_cRef;
+    }
     if(--m_cRef_ == 0)
     {
         delete this;
@@ -161,7 +183,7 @@ HRESULT_ ServerFactory::QueryInterface_(IID_ IID, void** ppv)
     default:
         cout << "ServerFactory.QueryInterface: Invalid interface" << endl;
         *ppv = NULL;
-        return S_FAIL;
+        return S_FALSE_;
     }
     reinterpret_cast<IUnknown_*>(*ppv)->AddRef_();
     return S_OK_;
@@ -170,141 +192,19 @@ HRESULT_ ServerFactory::QueryInterface_(IID_ IID, void** ppv)
 ULONG_ ServerFactory::AddRef_() 
 { 
     cout << "ServerFactory.AddRef = " << m_cRef_ + 1 << endl;
+    cout << "ServerFactory.GlobalAddRef = " << global_m_cRef + 1 << endl;
+    ++global_m_cRef;
     return ++m_cRef_; 
 } 
  
 ULONG_ ServerFactory::Release_() 
 { 
     cout << "ServerFactory.Release = " << m_cRef_ - 1 << endl;
-    if(--m_cRef_ == 0)
+    if(global_m_cRef != 0)
     {
-        delete this;
-        return 0;
+        cout << "ServerFactory.GloblaRelease = " << global_m_cRef - 1 << endl;
+        --global_m_cRef;
     }
-    return m_cRef_;
-}
-
-Server2::Server2() 
-{
-    m_cRef_ = 0;
-};
-Server2::Server2(int a_p, int b_p) 
-{
-    a = a_p;
-    b = b_p;
-    m_cRef_ = 0;
-};
-Server2::~Server2() 
-{
-    cout << "Server2.Destructor: Liquidated." << endl;
-};
-
-int Server2::Nod()
-{
-    result = 0;
-	for (int i = a; i > 0; i--)
-	{
-		if (a % i == 0 && b % i == 0)
-		{
-			result = i;
-			break;
-		}
-	}
-	return result;
-}
-
-HRESULT_ Server2::QueryInterface_(IID_ IID, void** ppv)
-{
-    switch (IID)
-    {
-    case IID_IUNKNOWN:
-        *ppv = (IUnknown_*)(IY*)ppv;
-        cout << "Server2.QueryInterface: IUnknown connected." << endl;
-        break;
-    case IID_IY:
-        *ppv = (IY*)this;
-        cout << "Server2.QueryInterface: IY connected." << endl;
-        break;
-    default:
-        *ppv = NULL;
-        cout << "Server2.QueryInterface: Invalid interface" << endl;
-        return S_FAIL;
-    }
-    reinterpret_cast<IUnknown_*>(*ppv)->AddRef_();
-    return S_OK_;
-}
-
-ULONG_ Server2::AddRef_() 
-{
-    cout << "Server2.AddRef = " << m_cRef_ + 1 << endl;
-    return ++m_cRef_; 
-} 
- 
-ULONG_ Server2::Release_() 
-{ 
-    cout << "Server2.Release = " << m_cRef_ - 1 << endl;
-    if(--m_cRef_ == 0)
-    {
-        delete this;
-        return 0;
-    }
-    return m_cRef_;
-}
-
-
-Server2Factory::Server2Factory() 
-{
-    m_cRef_ = 0;
-};
-Server2Factory::~Server2Factory() 
-{
-    cout << "Server2Factory.Destructor: Liquidated." << endl;
-};
-
-HRESULT_ Server2Factory::CreateInstance_(IID_ IID, void** ppv)
-{
-    Server2* server2 = new Server2;
-    cout << "Server2.CreateInstance: Server2 connected." << endl;
-    return server2->QueryInterface_(IID, ppv);
-};
-
-HRESULT_ Server2Factory::CreateInstance2_(IID_ IID, void** ppv, int num1, int num2)
-{
-    Server2* server2 = new Server2(num1, num2);
-    cout << "Server2.CreateInstance2: Server2 connected." << endl;
-    return server2->QueryInterface_(IID, ppv);
-};
-
-HRESULT_ Server2Factory::QueryInterface_(IID_ IID, void** ppv)
-{
-    switch (IID)
-    {
-    case IID_ICLASSFACTORY:
-        cout << "Server2Factory.QueryInterface: IClassFactory connected." << endl;
-        *ppv = (IClassFactory_*)this;
-        break;
-    case IID_ICLASSFACTORY2:
-        cout << "Server2Factory.QueryInterface: IClassFactory2 connected." << endl;
-        *ppv = (IClassFactory2_*)this;
-        break;
-    default:
-        cout << "Server2Factory.QueryInterface: Invalid interface" << endl;
-        *ppv = NULL;
-        return S_FAIL;
-    }
-    reinterpret_cast<IUnknown_*>(*ppv)->AddRef_();
-    return S_OK_;
-}
-
-ULONG_ Server2Factory::AddRef_() 
-{ 
-    cout << "Server2Factory.AddRef = " << m_cRef_ + 1 << endl;
-    return ++m_cRef_; 
-} 
- 
-ULONG_ Server2Factory::Release_() 
-{ 
-    cout << "Server2Factory.Release = " << m_cRef_ - 1 << endl;
     if(--m_cRef_ == 0)
     {
         delete this;
@@ -315,8 +215,8 @@ ULONG_ Server2Factory::Release_()
 
 BOOL APIENTRY DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
-    GetModuleFileName(hinstDLL, path, 512);
-
+    GetModuleFileName(hinstDLL, path, MAX_PATH);
+    global_m_cRef = 0;
     switch (fdwReason)
     {
         case DLL_PROCESS_ATTACH:
@@ -339,7 +239,4 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
     return TRUE; // succesful
 }
 
-
-//DLLRegisterServer - регистрирует DLL с помощью HINSTANCE hinstDLL
-//DLLUnRegisterServer - удаляет DLL
-//DLLCanUnloadNow - для выгрузки DLL (нужен глобальный счётчик использования DLL)
+//DLLUnRegisterServer - дерегестрирует DLL

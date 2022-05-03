@@ -8,7 +8,7 @@ typedef HRESULT_ (*FunctionType) (CLSID_, IID_, void**);
 
 int main()
 {
-    FunctionType GetClassObject_;
+    FunctionType GetClassObject;
     HINSTANCE h;
 
     h = LoadLibrary("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/Manager.dll");
@@ -19,16 +19,16 @@ int main()
            return 0;
     }
 
-    GetClassObject_ = (FunctionType) GetProcAddress(h,"GetClassObject_");
+    GetClassObject = (FunctionType) GetProcAddress(h,"GetClassObject");
 
-    if (!GetClassObject_)
+    if (!GetClassObject)
     {
           cout << "DLL function not found !!" << endl;
           return 0;
     }
 
     IClassFactory2_* pF = NULL;
-    HRESULT_ result = GetClassObject_(CLSID_SERVER, IID_ICLASSFACTORY2, (void**)&pF);
+    HRESULT_ result = GetClassObject(CLSID_SERVER, IID_ICLASSFACTORY2, (void**)&pF);
     if (result == S_OK_)
     {
         IY* pY = NULL;
@@ -37,18 +37,36 @@ int main()
         {
             cout << "NOD: " << pY->Nod() << endl;
         }
-        else cout << "Warning" << endl;
-        result = pY->QueryInterface_(IID_IX, (void**)&pY);
+        else
+        {
+            cout << "Warning" << endl;
+            pF->Release_();
+            system("pause");
+            return 0;
+        } 
+        IX* pX = NULL;
+        result = pY->QueryInterface_(IID_IX, (void**)&pX);
         if (result == S_OK_)
         {
-            cout << "NOK: " << pY->Nod() << endl;
-            pY->Release_();
+            cout << "NOK: " << pX->Nok() << endl;
+            pX->Release_();
         }
-        else cout << "Warning" << endl;
+        else
+        {
+            cout << "Warning" << endl;
+            pF->Release_();
+            system("pause");
+            return 0;
+        }
         pY->Release_();
+        pF->Release_();
+        system("pause");
+        return 0;
     }
-    else cout << "Warning" << endl;
-    pF->Release_();
-    system("pause");
-    return 0;
+    else
+    {
+        cout << "Warning" << endl;
+        system("pause");
+        return 0;
+    } 
 }

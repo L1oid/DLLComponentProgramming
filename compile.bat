@@ -3,9 +3,9 @@ echo off
 @REM pause
 @REM exit
 
-g++ -c ./source/ServersDLL.cpp -o ./build/ServersDLL.o
+g++ -c ./source/ServerDLL.cpp -o ./build/ServerDLL.o
 g++ -c ./source/Manager.cpp -o ./build/Manager.o
-g++ -shared ./build/ServersDLL.o -o ./build/ServersDLL.dll -Wl,--kill-at
+g++ -shared ./build/ServerDLL.o -o ./build/ServerDLL.dll -Wl,--kill-at
 g++ -shared ./build/Manager.o -o ./build/Manager.dll -Wl,--kill-at
 
 @REM pause

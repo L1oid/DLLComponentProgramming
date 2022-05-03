@@ -13,9 +13,8 @@ const int IID_ICLASSFACTORY = 1;
 const int IID_ICLASSFACTORY2 = 2;
 
 const int CLSID_SERVER = 1;
-const int CLSID_SERVER2 = 2;
 
 const int S_OK_ = 0;
-const int S_FAIL = 1;
+const int S_FALSE_ = 1;
 
 #endif
