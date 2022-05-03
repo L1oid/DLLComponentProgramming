@@ -31,6 +31,11 @@ extern "C"  HRESULT_ __declspec(dllexport) DllRegisterServer(void)
     string str_cls_id = to_string(CLSID_SERVER);
     string temp;
     ifstream f1("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/Reg.txt");
+    if (!f1)
+    {
+        cout << "Failure to open input file" << endl;
+        return S_FALSE_;
+    }
     while (f1 >> temp)
     {
         if (temp == str_cls_id)
@@ -47,9 +52,51 @@ extern "C"  HRESULT_ __declspec(dllexport) DllRegisterServer(void)
     
 }
 
-extern "C"  void __declspec(dllexport) DllUnregisterServer()
+extern "C"  HRESULT_ __declspec(dllexport) DllUnregisterServer()
 {
-
+    string temp;
+    string str_cls_id = to_string(CLSID_SERVER);
+    ifstream f1("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/Reg.txt");
+    if (!f1)
+    {
+        cout << "Failure to open input file" << endl;
+        return S_FALSE_;
+    }
+    ofstream f2("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/RegTemp.txt");
+    if (!f2)
+    {
+        cout << "Failure to open input file" << endl;
+        return S_FALSE_;
+    }
+    while (getline(f1, temp))
+    {
+        if (temp == str_cls_id + " " + path)
+        {
+            continue;
+        }
+        else f2 << temp << endl;
+    }
+    f1.close();
+    f2.close();
+    ofstream f3("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/Reg.txt");
+    if (!f3)
+    {
+        cout << "Failure to open input file" << endl;
+        return S_FALSE_;
+    }
+    ifstream f4("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/RegTemp.txt");
+    if (!f4)
+    {
+        cout << "Failure to open input file" << endl;
+        return S_FALSE_;
+    }
+    while (getline(f4, temp))
+    {
+        f3 << temp << endl;
+    }
+    f3.close();
+    f4.close();
+    remove("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/RegTemp.txt");
 }
 
 extern "C" HRESULT_ __declspec(dllexport) DllCanUnloadNow_()

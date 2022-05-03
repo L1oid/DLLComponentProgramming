@@ -6,12 +6,13 @@
 
 using namespace std;
 
+HINSTANCE hinstLib;
+
 typedef HRESULT_ (*FunctionType) (CLSID_, IID_, void**);
 
 extern "C" HRESULT_ __declspec(dllexport) GetClassObject(CLSID_ CLSID, IID_ IID, void** ppv)
 {
     FunctionType DLLGetClassObject;
-    HINSTANCE h;
     string temp;
     string str_cls_id = to_string(CLSID);
     char path[MAX_PATH] = {};
@@ -25,13 +26,13 @@ extern "C" HRESULT_ __declspec(dllexport) GetClassObject(CLSID_ CLSID, IID_ IID,
         }
     }
     f.close();
-    h = LoadLibrary(path);
-    if (!h)
+    hinstLib = LoadLibrary(path);
+    if (!hinstLib)
     {
            cout << "DLL not found !" << endl;
            return S_FALSE_;
     }
-    DLLGetClassObject = (FunctionType) GetProcAddress(h,"DLLGetClassObject");
+    DLLGetClassObject = (FunctionType) GetProcAddress(hinstLib, "DLLGetClassObject");
     if (!DLLGetClassObject)
     {
           cout << "DLL function not found !!" << endl;
@@ -42,5 +43,6 @@ extern "C" HRESULT_ __declspec(dllexport) GetClassObject(CLSID_ CLSID, IID_ IID,
 
 extern "C" HRESULT_ __declspec(dllexport) FreeUnusedLibrires()
 {
-   //FreeUnusedLibrires - проверка использования DLL
+    BOOL fFreeResult;
+    fFreeResult = FreeLibrary(hinstLib);
 }

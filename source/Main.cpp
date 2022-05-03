@@ -5,14 +5,15 @@
 using namespace std;
 
 typedef HRESULT_ (*FunctionType) (CLSID_, IID_, void**);
+typedef HRESULT_ (*FunctionType2) ();
 
 int main()
 {
     FunctionType GetClassObject;
+    FunctionType2 FreeUnusedLibrires;
     HINSTANCE h;
 
     h = LoadLibrary("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/Manager.dll");
-
     if (!h)
     {
            cout << "DLL not found !" << endl;
@@ -20,8 +21,14 @@ int main()
     }
 
     GetClassObject = (FunctionType) GetProcAddress(h,"GetClassObject");
-
     if (!GetClassObject)
+    {
+          cout << "DLL function not found !!" << endl;
+          return 0;
+    }
+
+    FreeUnusedLibrires = (FunctionType2) GetProcAddress(h,"FreeUnusedLibrires");
+    if (!FreeUnusedLibrires)
     {
           cout << "DLL function not found !!" << endl;
           return 0;
