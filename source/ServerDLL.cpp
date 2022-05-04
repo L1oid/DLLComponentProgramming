@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <fstream>
 #include "Server.h"
+#include <vector>
 #include "OBJBASE.h"
 
 using namespace std;
@@ -28,75 +29,54 @@ extern "C" HRESULT_ __declspec(dllexport) DLLGetClassObject(CLSID_ CLSID, IID_ I
 
 extern "C"  HRESULT_ __declspec(dllexport) DllRegisterServer(void)
 {
+    vector<string> dlls(1);
     string str_cls_id = to_string(CLSID_SERVER);
     string temp;
     ifstream f1("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/Reg.txt");
-    if (!f1)
-    {
-        cout << "Failure to open input file" << endl;
-        return S_FALSE_;
-    }
-    while (f1 >> temp)
-    {
-        if (temp == str_cls_id)
-        {
-            f1.close();
-            return S_OK_;
-        }
-    }
-    f1.close();
-    ofstream f2("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/Reg.txt", ios::app);
-    f2 << CLSID_SERVER << " " << path << endl;
-    f2.close();
-    return S_OK_;
-    
-}
-
-extern "C"  HRESULT_ __declspec(dllexport) DllUnregisterServer()
-{
-    string temp;
-    string str_cls_id = to_string(CLSID_SERVER);
-    ifstream f1("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/Reg.txt");
-    if (!f1)
-    {
-        cout << "Failure to open input file" << endl;
-        return S_FALSE_;
-    }
-    ofstream f2("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/RegTemp.txt");
-    if (!f2)
-    {
-        cout << "Failure to open input file" << endl;
-        return S_FALSE_;
-    }
     while (getline(f1, temp))
     {
         if (temp == str_cls_id + " " + path)
         {
+            return S_OK_;
+        }
+        if (temp[0] == str_cls_id[0])
+        {
             continue;
         }
-        else f2 << temp << endl;
+        dlls.push_back(temp);
     }
     f1.close();
+    ofstream f2("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/Reg.txt");
+    for(int i = 1; i < dlls.size(); i++)
+    {
+        f2 << dlls[i] << endl;
+    }
+    f2 << CLSID_SERVER << " " << path << endl;
     f2.close();
-    ofstream f3("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/Reg.txt");
-    if (!f3)
+    return S_OK_;
+}
+
+extern "C"  HRESULT_ __declspec(dllexport) DllUnregisterServer()
+{
+    vector<string> dlls(1);
+    string str_cls_id = to_string(CLSID_SERVER);
+    string temp;
+    ifstream f1("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/Reg.txt");
+    while (getline(f1, temp))
     {
-        cout << "Failure to open input file" << endl;
-        return S_FALSE_;
+        if (temp[0] == str_cls_id[0])
+        {
+            continue;
+        }
+        dlls.push_back(temp);
     }
-    ifstream f4("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/RegTemp.txt");
-    if (!f4)
+    f1.close();
+    ofstream f2("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/Reg.txt");
+    for(int i = 1; i < dlls.size(); i++)
     {
-        cout << "Failure to open input file" << endl;
-        return S_FALSE_;
+        f2 << dlls[i] << endl;
     }
-    while (getline(f4, temp))
-    {
-        f3 << temp << endl;
-    }
-    f3.close();
-    f4.close();
-    remove("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/RegTemp.txt");
+    f2.close();
     return S_OK_;
 }
 
