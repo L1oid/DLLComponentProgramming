@@ -17,4 +17,7 @@ const int CLSID_SERVER = 1;
 const int S_OK_ = 0;
 const int S_FALSE_ = 1;
 
+typedef HRESULT_ (*FunctionType) (CLSID_, IID_, void**);
+typedef HRESULT_ (*FunctionType2) ();
+
 #endif

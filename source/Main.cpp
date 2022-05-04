@@ -4,9 +4,6 @@
 #include "OBJBASE.h"
 using namespace std;
 
-typedef HRESULT_ (*FunctionType) (CLSID_, IID_, void**);
-typedef HRESULT_ (*FunctionType2) ();
-
 int main()
 {
     FunctionType GetClassObject;
@@ -23,14 +20,14 @@ int main()
     GetClassObject = (FunctionType) GetProcAddress(h,"GetClassObject");
     if (!GetClassObject)
     {
-          cout << "DLL function not found !!" << endl;
+          cout << "DLL GetClassObject not found !!" << endl;
           return 0;
     }
 
     FreeUnusedLibrires = (FunctionType2) GetProcAddress(h,"FreeUnusedLibrires");
     if (!FreeUnusedLibrires)
     {
-          cout << "DLL function not found !!" << endl;
+          cout << "DLL FreeUnusedLibrires not found !!" << endl;
           return 0;
     }
 
@@ -43,6 +40,7 @@ int main()
         if (result == S_OK_)
         {
             cout << "NOD: " << pY->Nod() << endl;
+            cout << "Library Status: " << FreeUnusedLibrires() << endl;
         }
         else
         {
@@ -66,7 +64,9 @@ int main()
             return 0;
         }
         pY->Release_();
+        cout << "Library Status: " << FreeUnusedLibrires() << endl;
         pF->Release_();
+        cout << "Library Status: " << FreeUnusedLibrires() << endl;
         system("pause");
         return 0;
     }

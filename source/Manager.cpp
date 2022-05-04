@@ -1,14 +1,14 @@
 #include <iostream>
 #include <windows.h>
 #include <fstream>
+#include <vector>
 #include "IUnknown.h"
 #include "OBJBASE.h"
 
 using namespace std;
 
 HINSTANCE hinstLib;
-
-typedef HRESULT_ (*FunctionType) (CLSID_, IID_, void**);
+vector<HINSTANCE> libs(1);
 
 extern "C" HRESULT_ __declspec(dllexport) GetClassObject(CLSID_ CLSID, IID_ IID, void** ppv)
 {
@@ -32,10 +32,11 @@ extern "C" HRESULT_ __declspec(dllexport) GetClassObject(CLSID_ CLSID, IID_ IID,
            cout << "DLL not found !" << endl;
            return S_FALSE_;
     }
+    libs.push_back(hinstLib);
     DLLGetClassObject = (FunctionType) GetProcAddress(hinstLib, "DLLGetClassObject");
     if (!DLLGetClassObject)
     {
-          cout << "DLL function not found !!" << endl;
+          cout << "DLL DLLGetClassObject not found !!" << endl;
           return S_FALSE_;
     } 
     return DLLGetClassObject(CLSID, IID, ppv);
@@ -43,6 +44,21 @@ extern "C" HRESULT_ __declspec(dllexport) GetClassObject(CLSID_ CLSID, IID_ IID,
 
 extern "C" HRESULT_ __declspec(dllexport) FreeUnusedLibrires()
 {
-    BOOL fFreeResult;
-    fFreeResult = FreeLibrary(hinstLib);
+    FunctionType2 DllCanUnloadNow_;
+    HRESULT_ result;
+    for (int i = 0; i < libs.size(); i++)
+    {
+        DllCanUnloadNow_ = (FunctionType2) GetProcAddress(libs[i], "DllCanUnloadNow_");
+        if (DllCanUnloadNow_)
+        {
+            result = DllCanUnloadNow_();
+            if (result == S_OK_)
+            {
+                FreeLibrary(libs[i]);
+                libs.erase(libs.begin() + i);
+                libs.resize(libs.size() - 1);
+            }
+        }
+    }
+    return result;
 }

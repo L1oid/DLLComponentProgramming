@@ -97,6 +97,7 @@ extern "C"  HRESULT_ __declspec(dllexport) DllUnregisterServer()
     f3.close();
     f4.close();
     remove("C:/Users/lloid/Documents/GitHub/DLLComponentProgramming/build/RegTemp.txt");
+    return S_OK_;
 }
 
 extern "C" HRESULT_ __declspec(dllexport) DllCanUnloadNow_()
@@ -285,5 +286,3 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
     }
     return TRUE; // succesful
 }
-
-//DLLUnRegisterServer - дерегестрирует DLL
