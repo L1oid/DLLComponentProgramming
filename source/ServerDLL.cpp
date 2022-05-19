@@ -19,12 +19,36 @@ extern "C" HRESULT_ __declspec(dllexport) DLLGetClassObject(CLSID_ CLSID, IID_ I
         pIUnknown = (IClassFactory_*) new ServerFactory;
         cout << "GetClassObject: ServerFactory connected." << endl;
         break;
+    case CLSID_SERVERMOD:
+        pIUnknown = (IClassFactory_*) new ServerModFactory;
+        cout << "GetClassObject: ServerModFactory connected." << endl;
+        break;
     default:
         cout << "GetClassObject: connection error." << endl;
         return S_FALSE_;
         break;
     }
     return pIUnknown->QueryInterface_(IID, ppv);
+}
+
+HRESULT_ GlobalCreateInstance(CLSID_ CLSID, IID_ IID, void** ppv, int num1, int num2)
+{
+    IClassFactory2_* pF = NULL;
+    HRESULT_ result;
+    switch (CLSID)
+    {
+    case CLSID_SERVER:
+        result = DLLGetClassObject(CLSID_SERVER, IID_ICLASSFACTORY2, (void**)&pF);
+        break;
+    case CLSID_SERVERMOD:
+        result = DLLGetClassObject(CLSID_SERVERMOD, IID_ICLASSFACTORY2, (void**)&pF);
+        break;
+    default:
+        cout << "CreateInstance: connection error." << endl;
+        return S_FALSE_;
+        break;
+    }
+    return pF->CreateInstance2_(IID, ppv, num1, num2);
 }
 
 extern "C"  HRESULT_ __declspec(dllexport) DllRegisterServer(void)
@@ -173,6 +197,89 @@ ULONG_ Server::Release_()
     return m_cRef_;
 }
 
+ServerMod::ServerMod() 
+{
+    m_cRef_ = 0;
+    GlobalCreateInstance(CLSID_SERVER, IID_IX, (void**)&this->ServerDefautlt, 6, 3);
+    cout << "ServerMod.Constructor: Created." << endl;
+};
+
+
+ServerMod::~ServerMod() 
+{
+    cout << "Server.Destructor: Liquidated." << endl;
+};
+
+HRESULT_ ServerMod::QueryInterface_(IID_ IID, void** ppv) 
+{
+    switch (IID)
+    {
+    case IID_IUNKNOWN:
+        *ppv = (IUnknown_*)(IX*)ppv;
+        cout << "Server.QueryInterface: IUnknown connected." << endl;
+        break;
+    case IID_IX:
+        *ppv = (IX*)this;
+        cout << "Server.QueryInterface: IX connected." << endl;
+        break;
+    case IID_IY:
+        *ppv = (IY*)this;
+        cout << "Server.QueryInterface: IY connected." << endl;
+        break;
+    case IID_IZ:
+        *ppv = (IZ*)this;
+        cout << "Server.QueryInterface: IZ connected." << endl;
+        break;
+    default:
+        *ppv = NULL;
+        cout << "Server.QueryInterface: Invalid interface" << endl;
+        return S_FALSE_;
+    }
+    reinterpret_cast<IUnknown_*>(*ppv)->AddRef_();
+    return S_OK_;
+}
+
+ULONG_ ServerMod::AddRef_() 
+{ 
+    cout << "ServerMod.AddRef = " << m_cRef_ + 1 << endl;
+    ServerDefautlt->AddRef_();
+    cout << "Server.GlobalAddRef = " << global_m_cRef + 1 << endl;
+    ++global_m_cRef;
+    return ++m_cRef_; 
+} 
+ 
+ULONG_ ServerMod::Release_()
+{ 
+    cout << "Server.Release = " << m_cRef_ - 1 << endl;
+    ServerDefautlt->Release_();
+    if(global_m_cRef != 0)
+    {
+        cout << "Server.GloblaRelease = " << global_m_cRef - 1 << endl;
+        --global_m_cRef;
+    }
+    if(--m_cRef_ == 0)
+    {
+        delete this;
+        return 0;
+    }
+    return m_cRef_;
+}
+
+int ServerMod::Nok()
+{
+    return ServerDefautlt->Nok();
+}
+
+int ServerMod::Nod()
+{
+    return ServerDefautlt->Nod();
+}
+
+int ServerMod::Sum()
+{
+    return Nok() + Nod();
+}
+
 ServerFactory::ServerFactory() 
 {
     m_cRef_ = 0;
@@ -226,6 +333,64 @@ ULONG_ ServerFactory::AddRef_()
 } 
  
 ULONG_ ServerFactory::Release_() 
+{ 
+    cout << "ServerFactory.Release = " << m_cRef_ - 1 << endl;
+    if(global_m_cRef != 0)
+    {
+        cout << "ServerFactory.GloblaRelease = " << global_m_cRef - 1 << endl;
+        --global_m_cRef;
+    }
+    if(--m_cRef_ == 0)
+    {
+        delete this;
+        return 0;
+    }
+    return m_cRef_;
+}
+
+ServerModFactory::ServerModFactory() 
+{
+    m_cRef_ = 0;
+    cout << "ServerModFactory.Constructor: Created." << endl;
+};
+ServerModFactory::~ServerModFactory() 
+{
+    cout << "ServerModFactory.Destructor: Liquidated." << endl;
+};
+
+HRESULT_ ServerModFactory::CreateInstance_(IID_ IID, void** ppv)
+{
+    ServerMod* serverMod = new ServerMod;
+    cout << "ServerMod.CreateInstance: Server connected." << endl;
+    return serverMod->QueryInterface_(IID, ppv);
+};
+
+HRESULT_ ServerModFactory::QueryInterface_(IID_ IID, void** ppv)
+{
+    switch (IID)
+    {
+    case IID_ICLASSFACTORY:
+        cout << "ServerModFactory.QueryInterface: IClassFactory connected." << endl;
+        *ppv = (IClassFactory_*)this;
+        break;
+    default:
+        cout << "ServerModFactory.QueryInterface: Invalid interface" << endl;
+        *ppv = NULL;
+        return S_FALSE_;
+    }
+    reinterpret_cast<IUnknown_*>(*ppv)->AddRef_();
+    return S_OK_;
+};
+
+ULONG_ ServerModFactory::AddRef_() 
+{ 
+    cout << "ServerFactory.AddRef = " << m_cRef_ + 1 << endl;
+    cout << "ServerFactory.GlobalAddRef = " << global_m_cRef + 1 << endl;
+    ++global_m_cRef;
+    return ++m_cRef_; 
+} 
+ 
+ULONG_ ServerModFactory::Release_() 
 { 
     cout << "ServerFactory.Release = " << m_cRef_ - 1 << endl;
     if(global_m_cRef != 0)

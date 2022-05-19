@@ -11,13 +11,32 @@ public:
     Server();
     Server(int, int);
     ~Server();
-    virtual int Nok();
-    virtual int Nod();
     HRESULT_ QueryInterface_(IID_, void**);
     ULONG_ AddRef_();
     ULONG_ Release_();
+
+    virtual int Nok();
+    virtual int Nod();
 };
-#endif
+
+class ServerMod : public IX, public IY, public IZ
+{
+private:
+    Server* ServerDefautlt;
+    int a, b, result;
+    long m_cRef_;
+public:
+    ServerMod();
+    ~ServerMod();
+    HRESULT_ QueryInterface_(IID_, void**);
+    ULONG_ AddRef_();
+    ULONG_ Release_();
+
+    virtual int Nok();
+    virtual int Nod();
+    virtual int Sum();
+
+};
 
 class ServerFactory : public IClassFactory2_
 {
@@ -32,3 +51,18 @@ public:
     ULONG_ AddRef_();
     ULONG_ Release_();
 };
+
+class ServerModFactory : public IClassFactory_
+{
+private:
+    long m_cRef_;
+public:
+    ServerModFactory();
+    ~ServerModFactory();
+    HRESULT_ CreateInstance_(IID_, void**);
+    HRESULT_ CreateInstance2_(IID_, void**, int, int);
+    HRESULT_ QueryInterface_(IID_, void**);
+    ULONG_ AddRef_();
+    ULONG_ Release_();
+};
+#endif

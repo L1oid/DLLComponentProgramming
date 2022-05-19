@@ -21,6 +21,12 @@ public:
     virtual int Nod() = 0;
 };
 
+class IZ : public IUnknown_
+{
+public:
+    virtual int Sum() = 0;
+};
+
 class IClassFactory_ : public IUnknown_
 {
 public:

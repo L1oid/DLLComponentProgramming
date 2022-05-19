@@ -31,12 +31,12 @@ int main()
           return 0;
     }
 
-    IClassFactory2_* pF = NULL;
-    HRESULT_ result = GetClassObject(CLSID_SERVER, IID_ICLASSFACTORY2, (void**)&pF);
+    IClassFactory_* pF = NULL;
+    HRESULT_ result = GetClassObject(CLSID_SERVERMOD, IID_ICLASSFACTORY, (void**)&pF);
     if (result == S_OK_)
     {
         IY* pY = NULL;
-        result = pF->CreateInstance2_(IID_IY, (void**)&pY, 3, 6);
+        result = pF->CreateInstance_(IID_IY, (void**)&pY);
         if (result == S_OK_)
         {
             cout << "NOD: " << pY->Nod() << endl;
@@ -49,20 +49,6 @@ int main()
             system("pause");
             return 0;
         } 
-        IX* pX = NULL;
-        result = pY->QueryInterface_(IID_IX, (void**)&pX);
-        if (result == S_OK_)
-        {
-            cout << "NOK: " << pX->Nok() << endl;
-            pX->Release_();
-        }
-        else
-        {
-            cout << "Warning" << endl;
-            pF->Release_();
-            system("pause");
-            return 0;
-        }
         pY->Release_();
         cout << "Library Status: " << FreeUnusedLibrires() << endl;
         pF->Release_();
