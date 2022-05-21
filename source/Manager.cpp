@@ -29,7 +29,7 @@ extern "C" HRESULT_ __declspec(dllexport) GetClassObject(CLSID_ CLSID, IID_ IID,
     hinstLib = LoadLibrary(path);
     if (!hinstLib)
     {
-           cout << "DLL not found !" << endl;
+           cout << "DLL not found111 !" << endl;
            return S_FALSE_;
     }
     libs.push_back(hinstLib);

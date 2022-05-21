@@ -13,15 +13,10 @@ class IX : public IUnknown_
 {
 public:
     virtual int Nok() = 0;
-};
-
-class IY : public IUnknown_
-{
-public:
     virtual int Nod() = 0;
 };
 
-class IZ : public IUnknown_
+class IY : public IUnknown_
 {
 public:
     virtual int Sum() = 0;

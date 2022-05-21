@@ -9,6 +9,7 @@ using namespace std;
 
 TCHAR path[MAX_PATH];
 long global_m_cRef;
+IClassFactory2_* pFGlobal = NULL;
 
 extern "C" HRESULT_ __declspec(dllexport) DLLGetClassObject(CLSID_ CLSID, IID_ IID, void** ppv)
 {
@@ -16,7 +17,7 @@ extern "C" HRESULT_ __declspec(dllexport) DLLGetClassObject(CLSID_ CLSID, IID_ I
     switch (CLSID) 
     {
     case CLSID_SERVER:
-        pIUnknown = (IClassFactory_*) new ServerFactory;
+        pIUnknown = (IClassFactory2_*) new ServerFactory;
         cout << "GetClassObject: ServerFactory connected." << endl;
         break;
     case CLSID_SERVERMOD:
@@ -33,22 +34,18 @@ extern "C" HRESULT_ __declspec(dllexport) DLLGetClassObject(CLSID_ CLSID, IID_ I
 
 HRESULT_ GlobalCreateInstance(CLSID_ CLSID, IID_ IID, void** ppv, int num1, int num2)
 {
-    IClassFactory2_* pF = NULL;
     HRESULT_ result;
     switch (CLSID)
     {
     case CLSID_SERVER:
-        result = DLLGetClassObject(CLSID_SERVER, IID_ICLASSFACTORY2, (void**)&pF);
-        break;
-    case CLSID_SERVERMOD:
-        result = DLLGetClassObject(CLSID_SERVERMOD, IID_ICLASSFACTORY2, (void**)&pF);
+        result = DLLGetClassObject(CLSID, IID_ICLASSFACTORY2, (void**)&pFGlobal);
         break;
     default:
-        cout << "CreateInstance: connection error." << endl;
+        cout << "GlobalCreateInstance: connection error." << endl;
         return S_FALSE_;
         break;
     }
-    return pF->CreateInstance2_(IID, ppv, num1, num2);
+    return pFGlobal->CreateInstance2_(IID, ppv, num1, num2);
 }
 
 extern "C"  HRESULT_ __declspec(dllexport) DllRegisterServer(void)
@@ -116,12 +113,14 @@ extern "C" HRESULT_ __declspec(dllexport) DllCanUnloadNow_()
 Server::Server() 
 {
     m_cRef_ = 0;
+    cout << "Server.Constructor: Created." << endl;
 };
 Server::Server(int a_p, int b_p) 
 {
     a = a_p;
     b = b_p;
     m_cRef_ = 0;
+    cout << "Server.Constructor: Created." << endl;
 };
 Server::~Server() 
 {
@@ -200,14 +199,14 @@ ULONG_ Server::Release_()
 ServerMod::ServerMod() 
 {
     m_cRef_ = 0;
-    GlobalCreateInstance(CLSID_SERVER, IID_IX, (void**)&this->ServerDefautlt, 6, 3);
     cout << "ServerMod.Constructor: Created." << endl;
+    GlobalCreateInstance(CLSID_SERVER, IID_IX, (void**)&this->ServerDefautlt, 6, 3);
 };
 
 
 ServerMod::~ServerMod() 
 {
-    cout << "Server.Destructor: Liquidated." << endl;
+    cout << "ServerMod.Destructor: Liquidated." << endl;
 };
 
 HRESULT_ ServerMod::QueryInterface_(IID_ IID, void** ppv) 
@@ -216,23 +215,19 @@ HRESULT_ ServerMod::QueryInterface_(IID_ IID, void** ppv)
     {
     case IID_IUNKNOWN:
         *ppv = (IUnknown_*)(IX*)ppv;
-        cout << "Server.QueryInterface: IUnknown connected." << endl;
+        cout << "ServerMod.QueryInterface: IUnknown connected." << endl;
         break;
     case IID_IX:
         *ppv = (IX*)this;
-        cout << "Server.QueryInterface: IX connected." << endl;
+        cout << "ServerMod.QueryInterface: IX connected." << endl;
         break;
     case IID_IY:
         *ppv = (IY*)this;
-        cout << "Server.QueryInterface: IY connected." << endl;
-        break;
-    case IID_IZ:
-        *ppv = (IZ*)this;
-        cout << "Server.QueryInterface: IZ connected." << endl;
+        cout << "ServerMod.QueryInterface: IY connected." << endl;
         break;
     default:
         *ppv = NULL;
-        cout << "Server.QueryInterface: Invalid interface" << endl;
+        cout << "ServerMod.QueryInterface: Invalid interface" << endl;
         return S_FALSE_;
     }
     reinterpret_cast<IUnknown_*>(*ppv)->AddRef_();
@@ -242,19 +237,18 @@ HRESULT_ ServerMod::QueryInterface_(IID_ IID, void** ppv)
 ULONG_ ServerMod::AddRef_() 
 { 
     cout << "ServerMod.AddRef = " << m_cRef_ + 1 << endl;
-    ServerDefautlt->AddRef_();
-    cout << "Server.GlobalAddRef = " << global_m_cRef + 1 << endl;
+    cout << "ServerMod.GlobalAddRef = " << global_m_cRef + 1 << endl;
     ++global_m_cRef;
     return ++m_cRef_; 
 } 
  
 ULONG_ ServerMod::Release_()
 { 
-    cout << "Server.Release = " << m_cRef_ - 1 << endl;
+    cout << "ServerMod.Release = " << m_cRef_ - 1 << endl;
     ServerDefautlt->Release_();
     if(global_m_cRef != 0)
     {
-        cout << "Server.GloblaRelease = " << global_m_cRef - 1 << endl;
+        cout << "ServerMod.GloblaRelease = " << global_m_cRef - 1 << endl;
         --global_m_cRef;
     }
     if(--m_cRef_ == 0)
@@ -283,6 +277,7 @@ int ServerMod::Sum()
 ServerFactory::ServerFactory() 
 {
     m_cRef_ = 0;
+    cout << "ServerFactory.Constructor: Created." << endl;
 };
 ServerFactory::~ServerFactory() 
 {
@@ -292,14 +287,14 @@ ServerFactory::~ServerFactory()
 HRESULT_ ServerFactory::CreateInstance_(IID_ IID, void** ppv)
 {
     Server* server = new Server;
-    cout << "Server.CreateInstance: Server connected." << endl;
+    cout << "ServerFactory.CreateInstance: Server connected." << endl;
     return server->QueryInterface_(IID, ppv);
 };
 
 HRESULT_ ServerFactory::CreateInstance2_(IID_ IID, void** ppv, int num1, int num2)
 {
     Server* server = new Server(num1, num2);
-    cout << "Server.CreateInstance2: Server connected." << endl;
+    cout << "ServerFactory.CreateInstance2: Server connected." << endl;
     return server->QueryInterface_(IID, ppv);
 };
 
@@ -334,6 +329,7 @@ ULONG_ ServerFactory::AddRef_()
  
 ULONG_ ServerFactory::Release_() 
 { 
+    cout << "kek" << endl;
     cout << "ServerFactory.Release = " << m_cRef_ - 1 << endl;
     if(global_m_cRef != 0)
     {
@@ -361,7 +357,7 @@ ServerModFactory::~ServerModFactory()
 HRESULT_ ServerModFactory::CreateInstance_(IID_ IID, void** ppv)
 {
     ServerMod* serverMod = new ServerMod;
-    cout << "ServerMod.CreateInstance: Server connected." << endl;
+    cout << "ServerModFactory.CreateInstance: Server connected." << endl;
     return serverMod->QueryInterface_(IID, ppv);
 };
 
@@ -384,18 +380,19 @@ HRESULT_ ServerModFactory::QueryInterface_(IID_ IID, void** ppv)
 
 ULONG_ ServerModFactory::AddRef_() 
 { 
-    cout << "ServerFactory.AddRef = " << m_cRef_ + 1 << endl;
-    cout << "ServerFactory.GlobalAddRef = " << global_m_cRef + 1 << endl;
+    cout << "ServerModFactory.AddRef = " << m_cRef_ + 1 << endl;
+    cout << "ServerModFactory.GlobalAddRef = " << global_m_cRef + 1 << endl;
     ++global_m_cRef;
     return ++m_cRef_; 
 } 
  
 ULONG_ ServerModFactory::Release_() 
 { 
-    cout << "ServerFactory.Release = " << m_cRef_ - 1 << endl;
+    cout << "ServerModFactory.Release = " << m_cRef_ - 1 << endl;
+    pFGlobal->Release_();
     if(global_m_cRef != 0)
     {
-        cout << "ServerFactory.GloblaRelease = " << global_m_cRef - 1 << endl;
+        cout << "ServerModFactory.GloblaRelease = " << global_m_cRef - 1 << endl;
         --global_m_cRef;
     }
     if(--m_cRef_ == 0)

@@ -2,7 +2,7 @@
 #define SERVER_H
 #include "IUnknown.h"
 #include "OBJBASE.h"
-class Server : public IX, public IY
+class Server : public IX
 {
 private:
     int a, b, result;
@@ -19,7 +19,7 @@ public:
     virtual int Nod();
 };
 
-class ServerMod : public IX, public IY, public IZ
+class ServerMod : public IX, public IY
 {
 private:
     Server* ServerDefautlt;

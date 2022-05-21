@@ -39,7 +39,7 @@ int main()
         result = pF->CreateInstance_(IID_IY, (void**)&pY);
         if (result == S_OK_)
         {
-            cout << "NOD: " << pY->Nod() << endl;
+            cout << "Sum: " << pY->Sum() << endl;
             cout << "Library Status: " << FreeUnusedLibrires() << endl;
         }
         else
@@ -48,7 +48,7 @@ int main()
             pF->Release_();
             system("pause");
             return 0;
-        } 
+        }
         pY->Release_();
         cout << "Library Status: " << FreeUnusedLibrires() << endl;
         pF->Release_();
